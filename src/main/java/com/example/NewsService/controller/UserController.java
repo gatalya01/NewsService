@@ -1,29 +1,53 @@
 package com.example.NewsService.controller;
 
 import com.example.NewsService.dto.UserDTO;
-import com.example.NewsService.service.UserService;
+import com.example.NewsService.service.Impl.UserServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.validation.Valid;
-import java.util.List;
+
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
+@Validated
 public class UserController {
-    private final UserService userService;
+
+    private final UserServiceImpl userServiceImpl;
 
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserServiceImpl userServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
     }
 
     @PostMapping
-    public UserDTO createUser(@Valid @RequestBody UserDTO userDTO) {
-        return userService.createUser(userDTO);
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO userDTO) {
+        UserDTO createdUser = userServiceImpl.createUser(userDTO);
+        return ResponseEntity
+                .created(UriComponentsBuilder.fromPath("/api/users/{id}")
+                        .buildAndExpand(createdUser.getId())
+                        .toUri())
+                .body(createdUser);
     }
 
-    @GetMapping
-    public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers();
+    @GetMapping("/{id}")
+    public ResponseEntity<UserDTO> getUser(@PathVariable Long id) {
+        UserDTO userDTO = userServiceImpl.getUserById(id);
+        return ResponseEntity.ok(userDTO);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+        userDTO.setId(id);
+        UserDTO updatedUser = userServiceImpl.updateUser(userDTO);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userServiceImpl.deleteUser(id);
+        return ResponseEntity.noContent().build();
     }
 }

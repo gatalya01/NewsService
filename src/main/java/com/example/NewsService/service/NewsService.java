@@ -23,7 +23,6 @@ public class NewsService {
     private final NewsMapper newsMapper;
     private final CategoryRepository categoryRepository;
 
-    @Autowired
     public NewsService(NewsRepository newsRepository, NewsMapper newsMapper, CategoryRepository categoryRepository) {
         this.newsRepository = newsRepository;
         this.newsMapper = newsMapper;
@@ -45,29 +44,25 @@ public class NewsService {
         return newsRepository.findById(id).map(newsMapper::toDTO);
     }
 
-    public void updateNews(NewsDTO newNewsDTO) {
-        News existingNews = newsRepository.findById(newNewsDTO.getId()).orElse(null);
-        if (existingNews == null) {
-            throw new IllegalArgumentException("Новость с указанным id не найдена");
-        }
-        existingNews.setTitle(newNewsDTO.getTitle());
-        existingNews.setContent(newNewsDTO.getContent());
+    public void updateNews(NewsDTO updatedNewsDTO) {
+        News existingNews = newsRepository.findById(updatedNewsDTO.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Новость с указанным id не найдена"));
 
-        Category category = categoryRepository.findById(newNewsDTO.getCategoryId()).orElse(null);
-        if (category == null) {
-            throw new IllegalArgumentException("Категория с указанным id не найдена");
-        }
+        existingNews.setTitle(updatedNewsDTO.getTitle());
+        existingNews.setContent(updatedNewsDTO.getContent());
+
+        Category category = categoryRepository.findById(updatedNewsDTO.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Категория с указанным id не найдена"));
         existingNews.setCategory(category);
 
         newsRepository.save(existingNews);
     }
 
     public void deleteNews(Long newsId) {
-        News existingNews = newsRepository.findById(newsId).orElse(null);
-        if (existingNews == null) {
-            throw new IllegalArgumentException("Новость с указанным id не найдена");
-        }
-        newsRepository.deleteById(newsId);
+        News existingNews = newsRepository.findById(newsId)
+                .orElseThrow(() -> new IllegalArgumentException("Новость с указанным id не найдена"));
+
+        newsRepository.delete(existingNews);
     }
 
     public Page<NewsDTO> filterNews(Long categoryId, Long authorId, Pageable pageable) {
