@@ -9,5 +9,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 
 @Repository
-public interface NewsRepository extends JpaRepository<News, Long>, JpaSpecificationExecutor<News> {
+public interface NewsRepository extends JpaRepository<News, Integer>, JpaSpecificationExecutor<News> {
 }

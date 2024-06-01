@@ -2,17 +2,16 @@ package com.example.NewsService.mapper;
 
 import com.example.NewsService.dto.CommentDTO;
 import com.example.NewsService.model.Comment;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface CommentMapper {
+    CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
 
-    @Mapping(source = "news.id", target = "newsId")
-    @Mapping(source = "author.id", target = "authorId")
-    CommentDTO toDTO(Comment comment);
+    CommentDTO toDto(Comment comment);
 
-    @Mapping(source = "newsId", target = "news.id")
-    @Mapping(source = "authorId", target = "author.id")
-    Comment toEntity(CommentDTO commentDTO);
-}
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "news.id", source = "newsId")
+    @Mapping(target = "user.id", source = "userId")
+    Comment toEntity(CommentDTO commentDTO);}

@@ -1,16 +1,18 @@
 package com.example.NewsService.dto;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Setter
-@Getter
+import java.time.Instant;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class NewsDTO {
-
-    private Long id;
+    private int newsId;
+    private int id;
     private String title;
     private String content;
-    private Long categoryId;
-    private Long authorId;
-    private int commentCount;
+    private int userId;
+    private int categoryId;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

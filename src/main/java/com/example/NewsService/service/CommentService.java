@@ -8,77 +8,69 @@ import com.example.NewsService.model.User;
 import com.example.NewsService.repository.CommentRepository;
 import com.example.NewsService.repository.NewsRepository;
 import com.example.NewsService.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @Service
+@RequiredArgsConstructor
 public class CommentService {
-
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
 
-    @Autowired
-    public CommentService(CommentRepository commentRepository, CommentMapper commentMapper,
-                          NewsRepository newsRepository, UserRepository userRepository) {
-        this.commentRepository = commentRepository;
-        this.commentMapper = commentMapper;
-        this.newsRepository = newsRepository;
-        this.userRepository = userRepository;
-    }
-
-    public CommentDTO createComment(CommentDTO commentDTO) {
-        Comment comment = commentMapper.toEntity(commentDTO);
-        News news = newsRepository.findById(commentDTO.getNewsId())
-                .orElseThrow(() -> new IllegalArgumentException("Новость с указанным id не найдена"));
-        User author = userRepository.findById(commentDTO.getAuthorId())
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь с указанным id не найден"));
-
-        comment.setNews(news);
-        comment.setAuthor(author);
-
-        Comment savedComment = commentRepository.save(comment);
-        return commentMapper.toDTO(savedComment);
-    }
-
-    public List<CommentDTO> getAllCommentsByNewsId(Long newsId) {
-        List<Comment> comments = commentRepository.findByNewsId(newsId);
-        return comments.stream()
-                .map(commentMapper::toDTO)
+    public List<CommentDTO> getAllComments() {
+        return commentRepository.findAll().stream()
+                .map(commentMapper::toDto)
                 .collect(Collectors.toList());
     }
 
-    public Optional<CommentDTO> getCommentById(Long id) {
-        return commentRepository.findById(id).map(commentMapper::toDTO);
+    public CommentDTO getCommentById(int id) {
+        return commentRepository.findById(id)
+                .map(commentMapper::toDto)
+                .orElseThrow(() -> new EntityNotFoundException("Comment not found"));
     }
 
-    public void updateComment(CommentDTO commentDTO) {
-        Comment existingComment = commentRepository.findById(commentDTO.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Комментарий с указанным id не найден"));
-
-        existingComment.setContent(commentDTO.getContent());
-
+    public CommentDTO createComment(CommentDTO commentDTO) {
+        User user = userRepository.findById(commentDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
         News news = newsRepository.findById(commentDTO.getNewsId())
-                .orElseThrow(() -> new IllegalArgumentException("Новость с указанным id не найдена"));
-        User author = userRepository.findById(commentDTO.getAuthorId())
-                .orElseThrow(() -> new IllegalArgumentException("Пользователь с указанным id не найден"));
+                .orElseThrow(() -> new EntityNotFoundException("News not found"));
 
-        existingComment.setNews(news);
-        existingComment.setAuthor(author);
-
-        commentRepository.save(existingComment);
+        Comment comment = commentMapper.toEntity(commentDTO);
+        comment.setUser(user);
+        comment.setNews(news);
+        return commentMapper.toDto(commentRepository.save(comment));
     }
 
-    public void deleteComment(Long commentId) {
-        Comment existingComment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new IllegalArgumentException("Комментарий с указанным id не найден"));
+    public CommentDTO updateComment(int id, CommentDTO commentDTO) {
+        if (!commentRepository.existsById(id)) {
+            throw new EntityNotFoundException("Comment not found");
+        }
 
-        commentRepository.delete(existingComment);
+        User user = userRepository.findById(commentDTO.getUserId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        News news = newsRepository.findById(commentDTO.getNewsId())
+                .orElseThrow(() -> new EntityNotFoundException("News not found"));
+
+        Comment comment = commentMapper.toEntity(commentDTO);
+        comment.setId(id);
+        comment.setUser(user);
+        comment.setNews(news);
+        return commentMapper.toDto(commentRepository.save(comment));
+    }
+
+    public void deleteComment(int id) {
+        if (!commentRepository.existsById(id)) {
+            throw new EntityNotFoundException("Comment not found");
+        }
+        commentRepository.deleteById(id);
     }
 }

@@ -1,45 +1,17 @@
 package com.example.NewsService.dto;
 
-import lombok.Getter;
-import lombok.Setter;
-@Setter
-@Getter
+import lombok.*;
+
+import java.time.Instant;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CommentDTO {
-
-    private Long id;
+    private int id;
     private String content;
-    private Long newsId;
-    private Long authorId;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public Long getNewsId() {
-        return newsId;
-    }
-
-    public void setNewsId(Long newsId) {
-        this.newsId = newsId;
-    }
-
-    public Long getAuthorId() {
-        return authorId;
-    }
-
-    public void setAuthorId(Long authorId) {
-        this.authorId = authorId;
-    }
+    private int newsId;
+    private int userId;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

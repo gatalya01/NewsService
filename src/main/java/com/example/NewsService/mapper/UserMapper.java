@@ -3,18 +3,19 @@ package com.example.NewsService.mapper;
 import com.example.NewsService.dto.UserDTO;
 import com.example.NewsService.model.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    UserDTO toDTO(User user);
+    UserDTO toDto(User user);
 
+    @Mapping(target = "id", ignore = true)
     User toEntity(UserDTO userDTO);
 
-    void updateEntityFromDTO(UserDTO userDTO, @MappingTarget User user);
+    default User createUserFromDTO(UserDTO userDTO) {
+        return new User(userDTO.getName());
+    }
 }

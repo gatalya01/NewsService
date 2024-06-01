@@ -1,27 +1,16 @@
 package com.example.NewsService.dto;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import java.time.Instant;
+
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserDTO {
-
-    private Long id;
-
-    @NotBlank
-    @Size(min = 2, max = 50)
-    private String username;
-
-    @NotBlank
-    @Email
-    private String email;
-
-    @NotBlank
-    @Size(min = 6)
-    private String password;
+    private int id;
+    private String name;
+    private Instant createdAt;
+    private Instant updatedAt;
 }

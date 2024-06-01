@@ -3,14 +3,20 @@ package com.example.NewsService.mapper;
 import com.example.NewsService.dto.CategoryDTO;
 import com.example.NewsService.model.Category;
 import org.mapstruct.Mapper;
-
-import java.util.List;
-
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
-    CategoryDTO toDTO(Category category);
+    CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
+
+    CategoryDTO toDto(Category category);
+
+    @Mapping(target = "id", ignore = true)
     Category toEntity(CategoryDTO categoryDTO);
 
-    List<CategoryDTO> toDTOs(List<Category> categories);
+    default Category createCategoryFromDTO(CategoryDTO categoryDTO) {
+        return new Category(categoryDTO.getName());
+    }
 }
