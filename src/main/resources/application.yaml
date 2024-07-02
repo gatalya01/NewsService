@@ -1,0 +1,38 @@
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger
+
+spring:
+  main:
+    allow-circular-references: true
+  application:
+    name: news
+  jpa:
+    generate-ddl: true
+    open-in-view: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: 654987123Yutre
+    hikari:
+      schema: news_schema
+      connection-init-sql: CREATE SCHEMA IF NOT EXISTS news_schema;
+      connection-timeout: 10000
+
+logging:
+  level:
+    org:
+      springframework: INFO
+      example:
+        news: INFO
+
+
+
+security:
+  user:
+    password: your_password
+    roles: USER

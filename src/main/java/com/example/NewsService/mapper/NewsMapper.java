@@ -1,22 +1,36 @@
 package com.example.NewsService.mapper;
 
-import com.example.NewsService.dto.NewsDTO;
+
+import com.example.NewsService.aop.Loggable;
+import com.example.NewsService.dto.news.*;
 import com.example.NewsService.model.News;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.*;
 
-@Mapper(componentModel = "spring")
+import java.util.List;
+
+@DecoratedWith(NewsMapperDelegate.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {CategoryMapper.class, CommentMapper.class})
 public interface NewsMapper {
-    NewsMapper INSTANCE = Mappers.getMapper(NewsMapper.class);
+    News requestToNews(NewsUpsertRequest request);
 
-    NewsDTO toDto(News news);
+    NewsResponse newsToNewsResponse(News news);
 
-    @Mapping(target = "id", ignore = true)
-    News toEntity(NewsDTO newsDTO);
+    @Loggable
+    default NewsResponseForList newsToNewsResponseForList(News news) {
+        return new NewsResponseForList(
+                news.getId(),
+                news.getTitle(),
+                news.getContent(),
+                news.getUser().getId(),
+                news.getCategory().getId(),
+                news.getComments().size()
+        );
+    }
 
-    default News createNewsFromDTO(NewsDTO newsDTO) {
-        return new News(newsDTO.getTitle(), newsDTO.getContent());
+    List<NewsResponseForList> newsListToListOfNewsResponse(List<News> news);
+
+    @Loggable
+    default NewsListResponse newsListToNewsListResponse(List<News> news) {
+        return new NewsListResponse(this.newsListToListOfNewsResponse(news));
     }
 }

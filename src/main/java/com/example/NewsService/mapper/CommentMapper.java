@@ -1,17 +1,25 @@
 package com.example.NewsService.mapper;
 
-import com.example.NewsService.dto.CommentDTO;
+import com.example.NewsService.aop.Loggable;
+import com.example.NewsService.dto.comment.CommentListResponse;
+import com.example.NewsService.dto.comment.CommentResponse;
+import com.example.NewsService.dto.comment.CommentUpsertRequest;
 import com.example.NewsService.model.Comment;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+import java.util.List;
+
+@DecoratedWith(CommentMapperDelegate.class)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface CommentMapper {
-    CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
+    Comment requestToComment(CommentUpsertRequest request);
 
-    CommentDTO toDto(Comment comment);
+    CommentResponse commentToCommentResponse(Comment comment);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "news.id", source = "newsId")
-    @Mapping(target = "user.id", source = "userId")
-    Comment toEntity(CommentDTO commentDTO);}
+    List<CommentResponse> commentListToListOfCommentResponse(List<Comment> comments);
+
+    @Loggable
+    default CommentListResponse commentListToCommentListResponse(List<Comment> comments) {
+        return new CommentListResponse(this.commentListToListOfCommentResponse(comments));
+    }
+}

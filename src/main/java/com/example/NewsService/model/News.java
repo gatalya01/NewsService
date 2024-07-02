@@ -1,7 +1,4 @@
 package com.example.NewsService.model;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldNameConstants;
@@ -14,6 +11,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldNameConstants
 @Entity(name = "news")
 public class News implements Identifiable {
@@ -40,30 +38,9 @@ public class News implements Identifiable {
     @Column(name = "updated")
     private Instant updatedAt;
 
-    @JsonCreator
-    public News(@JsonProperty("title") String title, @JsonProperty("content") String content) {
+    public News(String title, String content) {
         this.title = title;
         this.content = content;
     }
 
-    public News(String title, String content, User user) {
-        this.title = title;
-        this.content = content;
-        this.user = user;
-    }
-
-    public News(String title, String content, User user, Category category) {
-        this.title = title;
-        this.content = content;
-        this.user = user;
-        this.category = category;
-    }
-
-    public News(int id, String title, String content, User user, Category category) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.user = user;
-        this.category = category;
-    }
 }

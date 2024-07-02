@@ -1,8 +1,7 @@
 package com.example.NewsService.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -15,6 +14,7 @@ import java.time.Instant;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @FieldNameConstants
 @Entity(name = "comments")
 public class Comment implements Identifiable {
@@ -35,26 +35,7 @@ public class Comment implements Identifiable {
     @UpdateTimestamp
     private Instant updatedAt;
 
-    @JsonCreator
-    public Comment(@JsonProperty("content") String content) {
+    public Comment(String content) {
         this.content = content;
-    }
-
-    public Comment(String content, User user) {
-        this.content = content;
-        this.user = user;
-    }
-
-    public Comment(String content, News news, User user) {
-        this.content = content;
-        this.news = news;
-        this.user = user;
-    }
-
-    public Comment(int id, String content, News news, User user) {
-        this.id = id;
-        this.content = content;
-        this.news = news;
-        this.user = user;
     }
 }
